@@ -1,0 +1,12 @@
+https://core.telegram.org/bots/api#setwebhook
+
+//drop pending updates
+https://api.telegram.org/bot<BOT_TOKEN>/deleteWebhook?drop_pending_updates=true
+
+//Get Info Of Bot includes pending updates
+https://api.telegram.org/bot<BOT_TOKEN>/getWebhookInfo
+
+Note
+Telegram has two methods in running bot
+ - getUpdates - bot.launch()
+ - webhook - via functions like lambda
