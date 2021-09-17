@@ -44,7 +44,7 @@ bot.on('text', (ctx) => {
             bot.telegram.sendChatAction(ctx.chat.id, 'typing')
 
             //this is like .find({ dramaName: /searching/i}) and i is for case insensitive
-            homeModel.find({ dramaName: new RegExp(drama, 'i') }).limit(1000).then((dramas) => {
+            homeModel.find({ dramaName: new RegExp(drama, 'i') }).limit(100).then((dramas) => {
                 if (dramas.length > 0) {
                     ctx.reply(`<b>${ds.length}</b> dramas were found`, { parse_mode: 'HTML' })
                     bot.telegram.sendChatAction(ctx.chat.id, 'typing')
