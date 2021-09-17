@@ -1,0 +1,17 @@
+{
+  "name": "dramastorebot",
+  "version": "1.0.0",
+  "description": "Telegram bot to search for korean drama uploaded in telegram",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js"
+  },
+  "author": "shemdoe",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^10.0.0",
+    "mongoose": "^6.0.6",
+    "nodemon": "^2.0.12",
+    "telegraf": "^4.4.2"
+  }
+}
