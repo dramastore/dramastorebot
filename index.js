@@ -8,8 +8,6 @@ mongoose.connect(`mongodb://${process.env.USER}:${process.env.PASS}@nodetuts-sha
 const userModel = require('./models/botusers')
 const homeModel = require('./models/home-db')
 
-let isWorking = false
-// hapa
 bot.start(ctx => {
     let myFav = [1006615854, 1937862156, 1102676922, 1142303079, 1473393723]
     bot.telegram.sendChatAction(ctx.chat.id, 'typing')
@@ -28,17 +26,16 @@ bot.start(ctx => {
         })
 })
 
+let isWorking = []
 bot.on('text', async (ctx) => {
     try {
-        if (isWorking == true) {
-            // let msgID = ctx.message.message_id
-            // let chatid = ctx.chat.id
-            // let msg = "<b>Please wait, I\'m still working with other requests</b>"
-            // bot.telegram.sendMessage(chatid, msg, { reply_to_message_id: msgID, parse_mode: 'HTML' })
-
-            isWorking = false
+        if (isWorking.includes(ctx.chat.id)) {
+            let msgID = ctx.message.message_id
+            let chatid = ctx.chat.id
+            let msg = "<b>Oh! f*ck... Please wait, I\'m still sending you dramas</b>"
+            bot.telegram.sendMessage(chatid, msg, { reply_to_message_id: msgID, parse_mode: 'HTML' })
         }
-        if (isWorking == false) {
+        if (!isWorking.includes(ctx.chat.id)) {
             if (ctx.message.text.includes('/drama')) {
                 //notice space after drama--- this is to delete space before drama name
                 if (ctx.message.text == '/drama') {
@@ -52,6 +49,9 @@ bot.on('text', async (ctx) => {
                 //this is like .find({ dramaName: /searching/i}) and i is for case insensitive
                 homeModel.find({ dramaName: new RegExp(drama, 'i') }).limit(100).then((dramas) => {
                     if (dramas.length > 0) {
+                        if (!isWorking.includes(ctx.chat.id)) {
+                            isWorking.push(ctx.chat.id) //kama id haipo tunaongeza
+                        }
                         ctx.reply(`<b>${dramas.length}</b> dramas were found`, { parse_mode: 'HTML' })
                         bot.telegram.sendChatAction(ctx.chat.id, 'typing')
                         dramas.forEach((d, index) => {
@@ -62,10 +62,11 @@ bot.on('text', async (ctx) => {
                                 else {
                                     ctx.reply(`<b>◾ ${d.dramaName}<pre>\n</pre>www.dramastore.xyz/${d.episodesUrl}</b>`, { parse_mode: 'HTML', disable_web_page_preview: true })
                                 }
-                                if ((dramas.length - 1) > index) { isWorking = true }
-                                else {
-                                    isWorking = false
-                                    ctx.reply("I\'m Done.. You can search again")
+                                //anglia kama idadi == index ya  mwisho ya iteration
+                                if ((dramas.length - 1) == index) {
+                                    let del = isWorking.indexOf(ctx.chat.id)
+                                    isWorking.splice(del, 1)  //ondoa kwenye isWorking
+                                    ctx.reply('I\'m done... You can search again')
                                 }
                             }, index * 1200)
                         })
@@ -83,6 +84,9 @@ bot.on('text', async (ctx) => {
                                 .then((ds) => {
                                     ctx.reply(`<b>${ds.length}</b> dramas were found`, { parse_mode: 'HTML' })
                                     if (ds.length > 0) {
+                                        if (!isWorking.includes(ctx.chat.id)) {
+                                            isWorking.push(ctx.chat.id)
+                                        }
                                         bot.telegram.sendChatAction(ctx.chat.id, 'typing')
                                         ds.forEach((d, index) => {
                                             setTimeout(() => {
@@ -93,10 +97,10 @@ bot.on('text', async (ctx) => {
                                                 else {
                                                     ctx.reply(`<b>◾ ${d.dramaName}<pre>\n</pre>www.dramastore.xyz/${d.episodesUrl}</b>`, { parse_mode: 'HTML', disable_web_page_preview: true })
                                                 }
-                                                if ((ds.length - 1) > index) { isWorking = true }
-                                                else {
-                                                    isWorking = false
-                                                    ctx.reply("I\'m Done.. You can search again")
+                                                if ((ds.length - 1) == index) {
+                                                    let del = isWorking.indexOf(ctx.chat.id)
+                                                    isWorking.splice(del, 1)
+                                                    ctx.reply('I\'m done... You can search again')
                                                 }
                                             }, index * 1200)
                                         })
