@@ -4,7 +4,7 @@
   "description": "Telegram bot to search for korean drama uploaded in telegram",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index.js"
+    "start": "pm2 start index.js"
   },
   "author": "shemdoe",
   "license": "ISC",
