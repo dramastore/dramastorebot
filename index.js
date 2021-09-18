@@ -33,7 +33,7 @@ bot.on('text', async (ctx) => {
         if (isWorking == true) {
             let msgID = ctx.message.message_id
             let chatid = ctx.chat.id
-            let msg = "<b>Oh! f*ck... Please wait, I\'m still sending you dramas</b>"
+            let msg = "<b>Please wait, I\'m still working with other requests</b>"
             bot.telegram.sendMessage(chatid, msg, { reply_to_message_id: msgID, parse_mode: 'HTML' })
         }
         if (isWorking == false) {
@@ -198,5 +198,6 @@ process.on('unhandledRejection', (reason, promise) => {
     bot.telegram.sendMessage(1473393723, reason.response.description)
     console.log(reason.response.description)
     process.exit(0)
+    //on production here process will change from crash to start
 })
 
