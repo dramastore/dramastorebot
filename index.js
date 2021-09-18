@@ -31,10 +31,12 @@ bot.start(ctx => {
 bot.on('text', async (ctx) => {
     try {
         if (isWorking == true) {
-            let msgID = ctx.message.message_id
-            let chatid = ctx.chat.id
-            let msg = "<b>Please wait, I\'m still working with other requests</b>"
-            bot.telegram.sendMessage(chatid, msg, { reply_to_message_id: msgID, parse_mode: 'HTML' })
+            // let msgID = ctx.message.message_id
+            // let chatid = ctx.chat.id
+            // let msg = "<b>Please wait, I\'m still working with other requests</b>"
+            // bot.telegram.sendMessage(chatid, msg, { reply_to_message_id: msgID, parse_mode: 'HTML' })
+
+            isWorking = false
         }
         if (isWorking == false) {
             if (ctx.message.text.includes('/drama')) {
