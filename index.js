@@ -28,126 +28,136 @@ bot.start(ctx => {
         })
 })
 
-bot.on('text', (ctx) => {
-    if (isWorking == true) {
-        let msgID = ctx.message.message_id
-        let chatid = ctx.chat.id
-        let msg = "<b>Oh! f*ck... Please wait, I\'m still sending you dramas</b>"
-        bot.telegram.sendMessage(chatid, msg, { reply_to_message_id: msgID, parse_mode: 'HTML' })
-    }
-    if (isWorking == false) {
-        if (ctx.message.text.includes('/drama')) {
-            //notice space after drama--- this is to delete space before drama name
-            let drama = ctx.message.text.split('/drama ')[1]
-            let dramaArray = drama.split(" ")
-
-            bot.telegram.sendChatAction(ctx.chat.id, 'typing')
-
-            //this is like .find({ dramaName: /searching/i}) and i is for case insensitive
-            homeModel.find({ dramaName: new RegExp(drama, 'i') }).limit(100).then((dramas) => {
-                if (dramas.length > 0) {
-                    ctx.reply(`<b>${ds.length}</b> dramas were found`, { parse_mode: 'HTML' })
-                    bot.telegram.sendChatAction(ctx.chat.id, 'typing')
-                    dramas.forEach((d, index) => {
-                        setTimeout(() => {
-                            if (d.episodesUrl.includes('//t.me')) {
-                                ctx.reply(`<b>◾ ${d.dramaName}<pre>\n</pre>${d.episodesUrl}</b>`, { parse_mode: 'HTML', disable_web_page_preview: true })
-                            }
-                            else {
-                                ctx.reply(`<b>◾ ${d.dramaName}<pre>\n</pre>www.dramastore.xyz/${d.episodesUrl}</b>`, { parse_mode: 'HTML', disable_web_page_preview: true })
-                            }
-                            if ((dramas.length - 1) > index) { isWorking = true }
-                            else {
-                                isWorking = false
-                                ctx.reply("I\'m Done.. You can search again")
-                            }
-                        }, index * 1200)
-                    })
+bot.on('text', async (ctx) => {
+    try {
+        if (isWorking == true) {
+            let msgID = ctx.message.message_id
+            let chatid = ctx.chat.id
+            let msg = "<b>Oh! f*ck... Please wait, I\'m still sending you dramas</b>"
+            bot.telegram.sendMessage(chatid, msg, { reply_to_message_id: msgID, parse_mode: 'HTML' })
+        }
+        if (isWorking == false) {
+            if (ctx.message.text.includes('/drama')) {
+                //notice space after drama--- this is to delete space before drama name
+                if (ctx.message.text == '/drama') {
+                    ctx.reply('After <code>/drama</code> then the name of drama is followed... example - <pre>\n</pre><code>/drama Squid game</code>', { parse_mode: 'HTML' })
                 }
-                else {
-                    bot.telegram.sendChatAction(ctx.chat.id, 'typing')
-                    ctx.reply("No drama found by that name... but wait!!!.. let me try to find other dramas match that name")
+                let drama = ctx.message.text.split('/drama ')[1]
+                let dramaArray = drama.split(" ")
 
-                    //Tumia RegEx() na unganisha kwa | itatafuta kati ya hizo (or)
-                    if (dramaArray.length > 1) {
+                bot.telegram.sendChatAction(ctx.chat.id, 'typing')
+
+                //this is like .find({ dramaName: /searching/i}) and i is for case insensitive
+                homeModel.find({ dramaName: new RegExp(drama, 'i') }).limit(100).then((dramas) => {
+                    if (dramas.length > 0) {
+                        ctx.reply(`<b>${dramas.length}</b> dramas were found`, { parse_mode: 'HTML' })
                         bot.telegram.sendChatAction(ctx.chat.id, 'typing')
-                        let joiner = dramaArray.join('|')
-                        let regex = new RegExp(joiner, 'i')
-                        homeModel.find({ dramaName: regex }).limit(100).sort('dramaName')
-                            .then((ds) => {
-                                ctx.reply(`<b>${ds.length}</b> dramas were found`, { parse_mode: 'HTML' })
-                                if (ds.length > 0) {
-                                    bot.telegram.sendChatAction(ctx.chat.id, 'typing')
-                                    ds.forEach((d, index) => {
-                                        setTimeout(() => {
-                                            if (ds.length > 30) { bot.telegram.sendChatAction(ctx.chat.id, 'typing') }
-                                            if (d.episodesUrl.includes('//t.me')) {
-                                                ctx.reply(`<b>◾ ${d.dramaName}<pre>\n</pre>${d.episodesUrl}</b>`, { parse_mode: 'HTML', disable_web_page_preview: true })
-                                            }
-                                            else {
-                                                ctx.reply(`<b>◾ ${d.dramaName}<pre>\n</pre>www.dramastore.xyz/${d.episodesUrl}</b>`, { parse_mode: 'HTML', disable_web_page_preview: true })
-                                            }
-                                            if ((ds.length - 1) > index) { isWorking = true }
-                                            else {
-                                                isWorking = false
-                                                ctx.reply("I\'m Done.. You can search again")
-                                            }
-                                        }, index * 1200)
-                                    })
+                        dramas.forEach((d, index) => {
+                            setTimeout(() => {
+                                if (d.episodesUrl.includes('//t.me')) {
+                                    ctx.reply(`<b>◾ ${d.dramaName}<pre>\n</pre>${d.episodesUrl}</b>`, { parse_mode: 'HTML', disable_web_page_preview: true })
                                 }
                                 else {
-                                    bot.telegram.sendChatAction(ctx.chat.id, 'typing')
-                                    setTimeout(() => {
-                                        ctx.reply(`Ooopss! Sorry <b>${ctx.message.chat.first_name}..😥</b> No drama found... <pre>\n</pre>Request the drama from @shemdoe`, {
-                                            reply_markup: {
-                                                inline_keyboard: [
-                                                    [
-                                                        { text: "Request drama", url: 't.me/shemdoe' }
-                                                    ]
-                                                ]
-                                            }
-                                            , parse_mode: 'HTML'
-                                        })
-                                    }, 1000)
-
+                                    ctx.reply(`<b>◾ ${d.dramaName}<pre>\n</pre>www.dramastore.xyz/${d.episodesUrl}</b>`, { parse_mode: 'HTML', disable_web_page_preview: true })
                                 }
-                            })
-                            .catch((err) => {
-                                console.log(err.message)
-                                console.log(`Failed with ${ctx.message.text}`)
-                            })
+                                if ((dramas.length - 1) > index) { isWorking = true }
+                                else {
+                                    isWorking = false
+                                    ctx.reply("I\'m Done.. You can search again")
+                                }
+                            }, index * 1200)
+                        })
                     }
                     else {
                         bot.telegram.sendChatAction(ctx.chat.id, 'typing')
-                        setTimeout(() => {
-                            ctx.reply(`Ooopss! Sorry <b>${ctx.message.chat.first_name}..😥</b> No drama found... <pre>\n</pre>Request the drama from @shemdoe`, {
-                                reply_markup: {
-                                    inline_keyboard: [
-                                        [
-                                            { text: "Request drama", url: 't.me/shemdoe' }
+                        ctx.reply("No drama found by that name... but wait!!!.. let me try to find other dramas match that name")
+
+                        //Tumia RegEx() na unganisha kwa | itatafuta kati ya hizo (or)
+                        if (dramaArray.length > 1) {
+                            bot.telegram.sendChatAction(ctx.chat.id, 'typing')
+                            let joiner = dramaArray.join('|').replace(/ /g, '')
+                            let regex = new RegExp(joiner, 'i')
+                            homeModel.find({ dramaName: regex }).limit(100).sort('dramaName')
+                                .then((ds) => {
+                                    ctx.reply(`<b>${ds.length}</b> dramas were found`, { parse_mode: 'HTML' })
+                                    if (ds.length > 0) {
+                                        bot.telegram.sendChatAction(ctx.chat.id, 'typing')
+                                        ds.forEach((d, index) => {
+                                            setTimeout(() => {
+                                                if (ds.length > 30) { bot.telegram.sendChatAction(ctx.chat.id, 'typing') }
+                                                if (d.episodesUrl.includes('//t.me')) {
+                                                    ctx.reply(`<b>◾ ${d.dramaName}<pre>\n</pre>${d.episodesUrl}</b>`, { parse_mode: 'HTML', disable_web_page_preview: true })
+                                                }
+                                                else {
+                                                    ctx.reply(`<b>◾ ${d.dramaName}<pre>\n</pre>www.dramastore.xyz/${d.episodesUrl}</b>`, { parse_mode: 'HTML', disable_web_page_preview: true })
+                                                }
+                                                if ((ds.length - 1) > index) { isWorking = true }
+                                                else {
+                                                    isWorking = false
+                                                    ctx.reply("I\'m Done.. You can search again")
+                                                }
+                                            }, index * 1200)
+                                        })
+                                    }
+                                    else {
+                                        bot.telegram.sendChatAction(ctx.chat.id, 'typing')
+                                        setTimeout(() => {
+                                            ctx.reply(`Ooopss! Sorry <b>${ctx.message.chat.first_name}..😥</b> No drama found... <pre>\n</pre>Request the drama from @shemdoe`, {
+                                                reply_markup: {
+                                                    inline_keyboard: [
+                                                        [
+                                                            { text: "Request drama", url: 't.me/shemdoe' }
+                                                        ]
+                                                    ]
+                                                }
+                                                , parse_mode: 'HTML'
+                                            })
+                                        }, 1000)
+
+                                    }
+                                })
+                                .catch((err) => {
+                                    console.log(err.message)
+                                    console.log(`Failed with ${ctx.message.text}`)
+                                })
+                        }
+                        else {
+                            bot.telegram.sendChatAction(ctx.chat.id, 'typing')
+                            setTimeout(() => {
+                                ctx.reply(`Ooopss! Sorry <b>${ctx.message.chat.first_name}..😥</b> No drama found... <pre>\n</pre>Request the drama from @shemdoe`, {
+                                    reply_markup: {
+                                        inline_keyboard: [
+                                            [
+                                                { text: "Request drama", url: 't.me/shemdoe' }
+                                            ]
                                         ]
-                                    ]
-                                }
-                                , parse_mode: 'HTML'
-                            })
-                        }, 3000)
+                                    }
+                                    , parse_mode: 'HTML'
+                                })
+                            }, 3000)
+                        }
                     }
-                }
 
-            })
-                .catch((err) => {
-                    console.log(err.message)
-                    console.log(`Failed on ${ctx.message.text}`)
-                    ctx.reply(`Failed to get the drama, contact @shemdoe with this`)
                 })
-        }
+                    .catch((err) => {
+                        console.log(err.message)
+                        console.log(`Failed on ${ctx.message.text}`)
+                        ctx.reply(`Failed to get the drama, contact @shemdoe with this`)
+                    })
+            }
 
-        else {
-            bot.telegram.sendChatAction(ctx.chat.id, 'typing')
-            let msg = `Hello <b>${ctx.message.chat.first_name}</b> <pre>\n\n</pre>To search drama start with <code>/drama </code> followed by the name of drama. <pre>\n\n</pre><u>For example:</u><pre>\n</pre><code>/drama police university</code><pre>\n\n</pre>Also send me <code>/drama</code> followed by year to get all dramas of that year, for example: <pre>\n</pre><code>/drama 2016</code>`
-            ctx.reply(msg, { parse_mode: 'HTML' })
+            else {
+                bot.telegram.sendChatAction(ctx.chat.id, 'typing')
+                let msg = `Hello <b>${ctx.message.chat.first_name}</b> <pre>\n\n</pre>To search drama start with <code>/drama </code> followed by the name of drama. <pre>\n\n</pre><u>For example:</u><pre>\n</pre><code>/drama police university</code><pre>\n\n</pre>Also send me <code>/drama</code> followed by year to get all dramas of that year, for example: <pre>\n</pre><code>/drama 2016</code>`
+                ctx.reply(msg, { parse_mode: 'HTML' })
+            }
         }
+    } catch (err) {
+        console.log(err.message)
+        ctx.reply("Failed to search drama... correct your search and try again")
+        ctx.reply(`And forward this msg to @shemdoe --- ${err.message}`)
     }
+
 
 })
 
@@ -183,4 +193,9 @@ bot.launch()
 
 process.once('SIGINT', () => bot.stop('SIGINT'))
 process.once('SIGTERM', () => bot.stop('SIGTERM'))
+
+process.on('unhandledRejection', (reason, promise) => {
+    bot.telegram.sendMessage(1473393723, reason.response.description)
+    console.log(reason.response.description)
+})
 
