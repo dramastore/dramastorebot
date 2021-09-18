@@ -197,5 +197,6 @@ process.once('SIGTERM', () => bot.stop('SIGTERM'))
 process.on('unhandledRejection', (reason, promise) => {
     bot.telegram.sendMessage(1473393723, reason.response.description)
     console.log(reason.response.description)
+    process.exit(0)
 })
 
