@@ -57,10 +57,30 @@ bot.on('text', async (ctx) => {
                         dramas.forEach((d, index) => {
                             setTimeout(() => {
                                 if (d.episodesUrl.includes('//t.me')) {
-                                    ctx.reply(`<b>◾ ${d.dramaName}<pre>\n</pre>${d.episodesUrl}</b>`, { parse_mode: 'HTML', disable_web_page_preview: true })
+                                    ctx.reply(`<b><a href="${d.imageUrl}">◾</a> ${d.dramaName}<pre>\n</pre> __________</b>`, {
+                                        parse_mode: 'HTML',
+                                        disable_web_page_preview: false,
+                                        reply_markup: {
+                                            inline_keyboard: [
+                                                [
+                                                    { text: `⬇ GET - ${d.dramaName.substring(0, 20)}`, url: `${d.episodesUrl}` }
+                                                ]
+                                            ]
+                                        }
+                                    })
                                 }
                                 else {
-                                    ctx.reply(`<b>◾ ${d.dramaName}<pre>\n</pre>www.dramastore.xyz/${d.episodesUrl}</b>`, { parse_mode: 'HTML', disable_web_page_preview: true })
+                                    ctx.reply(`<b><a href="${d.imageUrl}">◾</a> ${d.dramaName}<pre>\n</pre> __________</b>`, {
+                                        parse_mode: 'HTML',
+                                        disable_web_page_preview: false,
+                                        reply_markup: {
+                                            inline_keyboard: [
+                                                [
+                                                    { text: `⬇ GET - ${d.dramaName.substring(0, 20)}`, url: `www.dramastore.xyz/${d.episodesUrl}` }
+                                                ]
+                                            ]
+                                        }
+                                    })
                                 }
                                 //anglia kama idadi == index ya  mwisho ya iteration
                                 if ((dramas.length - 1) == index) {
@@ -92,15 +112,38 @@ bot.on('text', async (ctx) => {
                                             setTimeout(() => {
                                                 if (ds.length > 30) { bot.telegram.sendChatAction(ctx.chat.id, 'typing') }
                                                 if (d.episodesUrl.includes('//t.me')) {
-                                                    ctx.reply(`<b>◾ ${d.dramaName}<pre>\n</pre>${d.episodesUrl}</b>`, { parse_mode: 'HTML', disable_web_page_preview: true })
+                                                    ctx.reply(`<b><a href="${d.imageUrl}">◾</a> ${d.dramaName}<pre>\n</pre> __________</b>`, {
+                                                        parse_mode: 'HTML',
+                                                        disable_web_page_preview: false,
+                                                        reply_markup: {
+                                                            inline_keyboard: [
+                                                                [
+                                                                    { text: `⬇ GET - ${d.dramaName.substring(0, 20)}`, url: `${d.episodesUrl}` }
+                                                                ]
+                                                            ]
+                                                        }
+                                                    })
                                                 }
                                                 else {
-                                                    ctx.reply(`<b>◾ ${d.dramaName}<pre>\n</pre>www.dramastore.xyz/${d.episodesUrl}</b>`, { parse_mode: 'HTML', disable_web_page_preview: true })
+                                                    ctx.reply(`<b><a href="${d.imageUrl}">◾</a> ${d.dramaName}<pre>\n</pre> __________</b>`, {
+                                                        parse_mode: 'HTML',
+                                                        disable_web_page_preview: false,
+                                                        reply_markup: {
+                                                            inline_keyboard: [
+                                                                [
+                                                                    { text: `⬇ GET - ${d.dramaName.substring(0, 20)}`, url: `www.dramastore.xyz/${d.episodesUrl}` }
+                                                                ]
+                                                            ]
+                                                        }
+                                                    })
                                                 }
                                                 if ((ds.length - 1) == index) {
                                                     let del = isWorking.indexOf(ctx.chat.id)
                                                     isWorking.splice(del, 1)
-                                                    ctx.reply('I\'m done... You can search again')
+                                                    setTimeout(() => {
+                                                        ctx.reply('I\'m done... You can search again')
+                                                    }, 2000)
+
                                                 }
                                             }, index * 1200)
                                         })
