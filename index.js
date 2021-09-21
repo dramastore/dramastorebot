@@ -48,11 +48,11 @@ bot.on('text', async (ctx) => {
 
                 //this is like .find({ dramaName: /searching/i}) and i is for case insensitive
                 homeModel.find({ dramaName: new RegExp(drama, 'i') }).limit(100).then((dramas) => {
+                    ctx.reply(`<b>${dramas.length}</b> dramas were found`, { parse_mode: 'HTML' })
                     if (dramas.length > 0) {
                         if (!isWorking.includes(ctx.chat.id)) {
                             isWorking.push(ctx.chat.id) //kama id haipo tunaongeza
                         }
-                        ctx.reply(`<b>${dramas.length}</b> dramas were found`, { parse_mode: 'HTML' })
                         bot.telegram.sendChatAction(ctx.chat.id, 'typing')
                         dramas.forEach((d, index) => {
                             setTimeout(() => {
@@ -103,67 +103,70 @@ bot.on('text', async (ctx) => {
                             homeModel.find({ dramaName: regex }).limit(100).sort('dramaName')
                                 .then((ds) => {
                                     ctx.reply(`<b>${ds.length}</b> dramas were found`, { parse_mode: 'HTML' })
-                                    if (ds.length > 0) {
-                                        if (!isWorking.includes(ctx.chat.id)) {
-                                            isWorking.push(ctx.chat.id)
-                                        }
-                                        bot.telegram.sendChatAction(ctx.chat.id, 'typing')
-                                        ds.forEach((d, index) => {
-                                            setTimeout(() => {
-                                                if (ds.length > 30) { bot.telegram.sendChatAction(ctx.chat.id, 'typing') }
-                                                if (d.episodesUrl.includes('//t.me')) {
-                                                    ctx.reply(`<b><a href="${d.imageUrl}">◾</a> ${d.dramaName}<pre>\n</pre> __________</b>`, {
-                                                        parse_mode: 'HTML',
-                                                        disable_web_page_preview: false,
-                                                        reply_markup: {
-                                                            inline_keyboard: [
-                                                                [
-                                                                    { text: `⬇ GET - ${d.dramaName.substring(0, 20)}`, url: `${d.episodesUrl}` }
+                                    bot.telegram.sendChatAction(ctx.chat.id, 'typing')
+                                    setTimeout(() => {
+                                        if (ds.length > 0) {
+                                            if (!isWorking.includes(ctx.chat.id)) {
+                                                isWorking.push(ctx.chat.id)
+                                            }
+                                            ds.forEach((d, index) => {
+                                                setTimeout(() => {
+                                                    if (ds.length > 30) { bot.telegram.sendChatAction(ctx.chat.id, 'typing') }
+                                                    if (d.episodesUrl.includes('//t.me')) {
+                                                        ctx.reply(`<b><a href="${d.imageUrl}">◾</a> ${d.dramaName}<pre>\n</pre> __________</b>`, {
+                                                            parse_mode: 'HTML',
+                                                            disable_web_page_preview: false,
+                                                            reply_markup: {
+                                                                inline_keyboard: [
+                                                                    [
+                                                                        { text: `⬇ GET - ${d.dramaName.substring(0, 20)}`, url: `${d.episodesUrl}` }
+                                                                    ]
                                                                 ]
-                                                            ]
-                                                        }
-                                                    })
-                                                }
-                                                else {
-                                                    ctx.reply(`<b><a href="${d.imageUrl}">◾</a> ${d.dramaName}<pre>\n</pre> __________</b>`, {
-                                                        parse_mode: 'HTML',
-                                                        disable_web_page_preview: false,
-                                                        reply_markup: {
-                                                            inline_keyboard: [
-                                                                [
-                                                                    { text: `⬇ GET - ${d.dramaName.substring(0, 20)}`, url: `www.dramastore.xyz/${d.episodesUrl}` }
+                                                            }
+                                                        })
+                                                    }
+                                                    else {
+                                                        ctx.reply(`<b><a href="${d.imageUrl}">◾</a> ${d.dramaName}<pre>\n</pre> __________</b>`, {
+                                                            parse_mode: 'HTML',
+                                                            disable_web_page_preview: false,
+                                                            reply_markup: {
+                                                                inline_keyboard: [
+                                                                    [
+                                                                        { text: `⬇ GET - ${d.dramaName.substring(0, 20)}`, url: `www.dramastore.xyz/${d.episodesUrl}` }
+                                                                    ]
                                                                 ]
-                                                            ]
-                                                        }
-                                                    })
-                                                }
-                                                if ((ds.length - 1) == index) {
-                                                    let del = isWorking.indexOf(ctx.chat.id)
-                                                    isWorking.splice(del, 1)
-                                                    setTimeout(() => {
-                                                        ctx.reply('I\'m done... You can search again')
-                                                    }, 2000)
+                                                            }
+                                                        })
+                                                    }
+                                                    if ((ds.length - 1) == index) {
+                                                        let del = isWorking.indexOf(ctx.chat.id)
+                                                        isWorking.splice(del, 1)
+                                                        setTimeout(() => {
+                                                            ctx.reply('I\'m done... You can search again')
+                                                        }, 2000)
 
-                                                }
-                                            }, index * 1200)
-                                        })
-                                    }
-                                    else {
-                                        bot.telegram.sendChatAction(ctx.chat.id, 'typing')
-                                        setTimeout(() => {
-                                            ctx.reply(`Ooopss! Sorry <b>${ctx.message.chat.first_name}..😥</b> No drama found... <pre>\n</pre>Request the drama from @shemdoe`, {
-                                                reply_markup: {
-                                                    inline_keyboard: [
-                                                        [
-                                                            { text: "Request drama", url: 't.me/shemdoe' }
-                                                        ]
-                                                    ]
-                                                }
-                                                , parse_mode: 'HTML'
+                                                    }
+                                                }, index * 1200)
                                             })
-                                        }, 1000)
+                                        }
+                                        else {
+                                            bot.telegram.sendChatAction(ctx.chat.id, 'typing')
+                                            setTimeout(() => {
+                                                ctx.reply(`Ooopss! Sorry <b>${ctx.message.chat.first_name}..😥</b> No drama found... <pre>\n</pre>Request the drama from @shemdoe`, {
+                                                    reply_markup: {
+                                                        inline_keyboard: [
+                                                            [
+                                                                { text: "Request drama", url: 't.me/shemdoe' }
+                                                            ]
+                                                        ]
+                                                    }
+                                                    , parse_mode: 'HTML'
+                                                })
+                                            }, 1000)
 
-                                    }
+                                        }
+                                    }, 2000)
+
                                 })
                                 .catch((err) => {
                                     console.log(err.message)
@@ -223,7 +226,7 @@ bot.on('photo', ctx => {
                 subs.forEach((sub, index) => {
                     setTimeout(() => {
                         bot.telegram.sendPhoto(sub.id, photoId, { caption, caption_entities })
-                    }, index * 1000)
+                    }, index * 100)
 
                 })
             })
